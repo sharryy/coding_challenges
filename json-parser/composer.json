@@ -1,0 +1,38 @@
+{
+  "name": "sharryy/json-parser",
+  "description": "A small package to parse json",
+  "type": "library",
+  "version": "1.0.0",
+  "require": {
+    "symfony/console": "^6.4",
+    "symfony/var-dumper": "^6.4"
+  },
+  "require-dev": {
+    "pestphp/pest": "^2.34"
+  },
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/pest"
+  },
+  "authors": [
+    {
+      "name": "Sharryy",
+      "email": "ibneadam388@gmail.com"
+    }
+  ],
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}

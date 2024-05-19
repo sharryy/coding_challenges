@@ -1,0 +1,37 @@
+{
+  "name": "sharryy/coding_challenges",
+  "description": "A set of coding challenges to enhance your programming skills",
+  "type": "project",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Sharryy",
+      "email": "ibneadam388@gmail.com"
+    }
+  ],
+  "scripts": {
+    "test": "vendor/bin/pest"
+  },
+  "require": {
+    "symfony/console": "^6.4",
+    "symfony/var-dumper": "^6.4"
+  },
+  "require-dev": {
+    "pestphp/pest": "^2.34"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}
