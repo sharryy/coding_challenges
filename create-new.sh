@@ -84,17 +84,3 @@ require __DIR__ . '/vendor/autoload.php';
 EOF
 
 touch src/$PROJECT_NAME.php
-cat >src/$PROJECT_NAME.php <<EOF
-<?php
-
-namespace App;
-
-class Stub
-{
-    public function __construct()
-    {
-        //
-    }
-}
-
-EOF
