@@ -45,6 +45,9 @@ cat >composer.json <<EOF
       "Tests\\\\": "tests/"
     }
   },
+  "scripts": {
+    "test": "vendor/bin/pest"
+  },
   "authors": [
     {
       "name": "Sharryy",
