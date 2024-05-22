@@ -57,3 +57,20 @@ it('can count the frequency of numbers and characters', function () {
         '.' => 1,
     ]);
 });
+
+it('can build huffman tree from frequency table', function () {
+    $coder = new HuffmanCoder();
+
+    $result = $coder->buildHuffmanTree([
+        'C' => 32,
+        'D' => 42,
+        'E' => 120,
+        'K' => 7,
+        'L' => 42,
+        'M' => 24,
+        'U' => 37,
+        'Z' => 2,
+    ]);
+
+    expect($result->getWeight())->toBe(306);
+});
