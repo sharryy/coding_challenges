@@ -38,11 +38,11 @@ class JsonParser
         while ($this->cursor < $length) {
             // Only two conditions because JSON can only start from
             // either an object or array. There is no third option.
-            if ($tokens[$this->cursor]->type == Type::LEFT_BRACE) {
-                $this->move(Type::LEFT_BRACE, $tokens);
+            if ($tokens[$this->cursor]->type == NodeType::LEFT_BRACE) {
+                $this->move(NodeType::LEFT_BRACE, $tokens);
                 $this->results = $this->object($tokens);
-            } elseif ($tokens[$this->cursor]->type == Type::LEFT_BRACKET) {
-                $this->move(Type::LEFT_BRACKET, $tokens);
+            } elseif ($tokens[$this->cursor]->type == NodeType::LEFT_BRACKET) {
+                $this->move(NodeType::LEFT_BRACKET, $tokens);
                 $this->results = $this->array($tokens);
             } else {
                 throw new RuntimeException("Unexpected token: `{$tokens[$this->cursor]->type->value}`");
@@ -56,36 +56,36 @@ class JsonParser
     {
         $results = [];
 
-        while ($this->peek($tokens)->type !== Type::RIGHT_BRACE) {
+        while ($this->peek($tokens)->type !== NodeType::RIGHT_BRACE) {
             // Valid Object looks like that
             // {"string" : "value" }
             // That's what we are doing
             // First parsing key which should be string, then colon and then value
             $key = $this->string($tokens);
-            $this->move(Type::COLON, $tokens);
+            $this->move(NodeType::COLON, $tokens);
             $value = $this->value($tokens);
 
             $results[$key] = $value;
 
-            if ($this->peek($tokens)->type === Type::RIGHT_BRACE) {
+            if ($this->peek($tokens)->type === NodeType::RIGHT_BRACE) {
                 break;
             }
 
-            $this->move(Type::COMMA, $tokens);
+            $this->move(NodeType::COMMA, $tokens);
 
-            if ($this->peek($tokens)->type === Type::RIGHT_BRACE) {
+            if ($this->peek($tokens)->type === NodeType::RIGHT_BRACE) {
                 throw new RuntimeException("Unexpected comma at the end of object");
             }
         }
 
-        $this->move(Type::RIGHT_BRACE, $tokens);
+        $this->move(NodeType::RIGHT_BRACE, $tokens);
 
         return $results;
     }
 
     private function string(array $tokens): string
     {
-        if ($this->peek($tokens)->type !== Type::STRING) {
+        if ($this->peek($tokens)->type !== NodeType::STRING) {
             throw new RuntimeException("Unexpected token: `{$this->peek($tokens)->type->value}`");
         }
 
@@ -104,12 +104,12 @@ class JsonParser
         // Values method is a generic method to accommodate values for objects and arrays
         // In JSON, values can be null, string, boolean, number, object or array
         return match ($token->type) {
-            Type::NULL => null,
-            Type::STRING => $token->value,
-            Type::BOOLEAN => $token->value === 'true',
-            Type::NUMBER => $this->number($token),
-            Type::LEFT_BRACE => $this->object($tokens),
-            Type::LEFT_BRACKET => $this->array($tokens),
+            NodeType::NULL => null,
+            NodeType::STRING => $token->value,
+            NodeType::BOOLEAN => $token->value === 'true',
+            NodeType::NUMBER => $this->number($token),
+            NodeType::LEFT_BRACE => $this->object($tokens),
+            NodeType::LEFT_BRACKET => $this->array($tokens),
             default => throw new RuntimeException("Unexpected token: `{$token->type->value}`"),
         };
     }
@@ -123,7 +123,7 @@ class JsonParser
         return $tokens[$this->cursor];
     }
 
-    private function move(Type $type, array $tokens): void
+    private function move(NodeType $type, array $tokens): void
     {
         if ($tokens[$this->cursor]->type !== $type) {
             throw new RuntimeException("Unexpected token: `{$tokens[$this->cursor]->type->value}`");
@@ -136,24 +136,24 @@ class JsonParser
     {
         $results = [];
 
-        while ($this->peek($tokens)->type !== Type::RIGHT_BRACKET) {
+        while ($this->peek($tokens)->type !== NodeType::RIGHT_BRACKET) {
             // Since array can't have keys, we are directly parsing values.
             // Values would take care of parsing the value and making
             // sure it is valid
             $results[] = $this->value($tokens);
 
-            if ($this->peek($tokens)->type === Type::RIGHT_BRACKET) {
+            if ($this->peek($tokens)->type === NodeType::RIGHT_BRACKET) {
                 break;
             }
 
-            $this->move(Type::COMMA, $tokens);
+            $this->move(NodeType::COMMA, $tokens);
 
-            if ($this->peek($tokens)->type === Type::RIGHT_BRACKET) {
+            if ($this->peek($tokens)->type === NodeType::RIGHT_BRACKET) {
                 throw new RuntimeException("Unexpected comma at the end of array");
             }
         }
 
-        $this->move(Type::RIGHT_BRACKET, $tokens);
+        $this->move(NodeType::RIGHT_BRACKET, $tokens);
 
         return $results;
     }
