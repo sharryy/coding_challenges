@@ -74,3 +74,31 @@ it('can build huffman tree from frequency table', function () {
 
     expect($result->getWeight())->toBe(306);
 });
+
+it('can extract prefix codes from huffman tree', function () {
+    $coder = new HuffmanCoder();
+
+    $result = $coder->buildHuffmanTree([
+        'C' => 32,
+        'D' => 42,
+        'E' => 120,
+        'K' => 7,
+        'L' => 42,
+        'M' => 24,
+        'U' => 37,
+        'Z' => 2,
+    ]);
+
+    $codes = $coder->extractCodes($result);
+
+    expect($codes)->toMatchArray([
+        'E' => '0',
+        'U' => '100',
+        'D' => '101',
+        'L' => '110',
+        'C' => '1110',
+        'K' => '111101',
+        'M' => '11111',
+        'Z' => '111100',
+    ]);
+});
