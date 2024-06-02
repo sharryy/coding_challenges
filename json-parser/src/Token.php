@@ -6,7 +6,7 @@ use Stringable;
 
 class Token implements Stringable
 {
-    public function __construct(public NodeType $type, public string $value)
+    public function __construct(public Type $type, public string $value)
     {
     }
 

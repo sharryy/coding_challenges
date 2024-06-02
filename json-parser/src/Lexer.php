@@ -21,18 +21,18 @@ class Lexer
             $token = $input[$this->cursor];
 
             if ($token == '{') {
-                $this->tokens[] = new Token(NodeType::LEFT_BRACE, $token);
+                $this->tokens[] = new Token(Type::LEFT_BRACE, $token);
             } elseif ($token == '"') {
-                $this->tokens[] = new Token(NodeType::STRING, $this->lexStrings($input));
+                $this->tokens[] = new Token(Type::STRING, $this->lexStrings($input));
             } elseif ($token == ':') {
-                $this->tokens[] = new Token(NodeType::COLON, $token);
+                $this->tokens[] = new Token(Type::COLON, $token);
             } elseif ($token == '}') {
-                $this->tokens[] = new Token(NodeType::RIGHT_BRACE, $token);
+                $this->tokens[] = new Token(Type::RIGHT_BRACE, $token);
             } elseif ($token == " ") {
                 $this->cursor++;
                 continue;
             } elseif ($token == ',') {
-                $this->tokens[] = new Token(NodeType::COMMA, $token);
+                $this->tokens[] = new Token(Type::COMMA, $token);
             } elseif (ctype_alpha($token)) {
                 $this->tokens[] = $this->lexNullAndBooleans($input);
             } elseif (is_numeric($token) || $token == '-') {
@@ -41,9 +41,9 @@ class Lexer
                 // So numbers can start with minus and can contain minus in scientific notation
                 $this->tokens[] = $this->lexNumbers($input);
             } elseif ($token == '[') {
-                $this->tokens[] = new Token(NodeType::LEFT_BRACKET, $token);
+                $this->tokens[] = new Token(Type::LEFT_BRACKET, $token);
             } elseif ($token == ']') {
-                $this->tokens[] = new Token(NodeType::RIGHT_BRACKET, $token);
+                $this->tokens[] = new Token(Type::RIGHT_BRACKET, $token);
             } elseif ($token == "\n") {
                 $this->cursor++;
                 continue;
@@ -121,7 +121,7 @@ class Lexer
 
     private function lexNullAndBooleans(string $input): Token
     {
-        foreach (['true' => NodeType::BOOLEAN, 'false' => NodeType::BOOLEAN, 'null' => NodeType::NULL] as $keyword => $type) {
+        foreach (['true' => Type::BOOLEAN, 'false' => Type::BOOLEAN, 'null' => Type::NULL] as $keyword => $type) {
             if (substr($input, $this->cursor, strlen($keyword)) === $keyword) {
                 $this->cursor += strlen($keyword) - 1;
                 return new Token($type, $keyword);
@@ -145,7 +145,7 @@ class Lexer
 
         $this->cursor--;
 
-        return new Token(NodeType::NUMBER, $number);
+        return new Token(Type::NUMBER, $number);
     }
 
     private function formatUnicode(string $input): string

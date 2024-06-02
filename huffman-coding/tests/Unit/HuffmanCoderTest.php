@@ -1,13 +1,13 @@
 <?php
 
-use App\HuffmanCoder;
+use App\Encoder;
 
 it('can count the frequency of characters', function () {
-    $file = file_get_contents('tests/datasets/step1/test.txt');
+    $data = file_get_contents('tests/datasets/test.txt');
 
-    $coder = new HuffmanCoder();
+    $coder = new Encoder;
 
-    $result = $coder->buildFrequencyTable($file);
+    $result = $coder->countFrequency($data);
 
     expect($result)->toBe([
         'L' => 1,
@@ -28,11 +28,11 @@ it('can count the frequency of characters', function () {
 });
 
 it('can count the frequency of numbers and characters', function () {
-    $file = file_get_contents('tests/datasets/step1/test1.txt');
+    $data = file_get_contents('tests/datasets/test1.txt');
 
-    $coder = new HuffmanCoder();
+    $coder = new Encoder;
 
-    $result = $coder->buildFrequencyTable($file);
+    $result = $coder->countFrequency($data);
 
     expect($result)->toBe([
         'T' => 1,
@@ -59,9 +59,9 @@ it('can count the frequency of numbers and characters', function () {
 });
 
 it('can build huffman tree from frequency table', function () {
-    $coder = new HuffmanCoder();
+    $coder = new Encoder;
 
-    $result = $coder->buildHuffmanTree([
+    $result = $coder->buildTree([
         'C' => 32,
         'D' => 42,
         'E' => 120,
@@ -76,9 +76,9 @@ it('can build huffman tree from frequency table', function () {
 });
 
 it('can extract prefix codes from huffman tree', function () {
-    $coder = new HuffmanCoder();
+    $coder = new Encoder();
 
-    $result = $coder->buildHuffmanTree([
+    $result = $coder->buildTree([
         'C' => 32,
         'D' => 42,
         'E' => 120,

@@ -3,23 +3,16 @@
 namespace App;
 
 use SplPriorityQueue;
+use RuntimeException;
 
-class HuffmanCoder
+class Encoder
 {
-    private const CONTROL_CHAR = "\0000";
-
-    /**
-     * Count the frequency of all characters in a given string
-     */
-    public function buildFrequencyTable(string $input): array
+    public function countFrequency(string $input): array
     {
         return array_count_values(mb_str_split($input));
     }
 
-    /**
-     * This method build the huffman-tree and returns the top element
-     */
-    public function buildHuffmanTree(array $frequency): Node
+    public function buildTree(array $frequency): Node
     {
         // "Huffman-tree" is built using bottom-to-top approach. Means we will first
         // add leaf nodes to the tree and then internal nodes.
@@ -42,10 +35,7 @@ class HuffmanCoder
         while ($queue->count() > 1) {
             $first = $queue->extract();
             $second = $queue->extract();
-
             $weight = $first->getWeight() + $second->getWeight();
-
-            // Again negative weight to make sure that it acts like "min-heap"
             $queue->insert(value: new Internal($first, $second, $weight), priority: -($weight));
         }
 
@@ -70,48 +60,32 @@ class HuffmanCoder
         return $result;
     }
 
-    public function encode(string $input, string $output): void
+    public function compress(string $input, array $codes): string
     {
-        $table = $this->buildFrequencyTable($input);
-        $tree = $this->buildHuffmanTree($table);
-        $codes = $this->extractCodes($tree);
-        $data = $this->compressData($input, $codes);
-        $header = $this->compressHeader($codes);
+        // Encode the data using frequency table
+        $encoded = array_reduce(mb_str_split($input), fn($carry, $char) => $carry.$codes[$char], '');
 
-        $stream = fopen($output, 'wb');
-        fwrite($stream, $header);
-        fwrite($stream, self::CONTROL_CHAR);
-        fwrite($stream, $data);
-        fclose($stream);
+        $padding = strlen($encoded) % 8;
+
+        // Make the length of the encoded data a multiple of 8.
+        // This would help in decoding.
+        if ($padding > 0) {
+            $encoded .= str_repeat('0', 8 - $padding);
+        }
+
+        $chunks = str_split($encoded, 8);
+
+        return chr($padding).implode('', array_map(fn($chunk) => chr(bindec($chunk)), $chunks));
     }
 
-    private function compressData(string $input, array $codes): string
+    public function readFile(string $path): string
     {
-        $encoded = '';
+        $stream = fopen($path, 'rb');
 
-        foreach (mb_str_split($input) as $char) {
-            $encoded .= $codes[$char];
+        if (! $stream) {
+            throw new RuntimeException("Unable to read file");
         }
 
-        if (strlen($encoded) % 8 !== 0) {
-            $encoded .= str_repeat('0', 8 - (strlen($encoded) % 8));
-        }
-
-        $encoded = array_map(fn($byte) => chr(bindec($byte)), str_split($encoded, 8));
-
-        return implode('', $encoded);
-    }
-
-    private function compressHeader(array $codes): string
-    {
-        $header = '';
-
-        foreach ($codes as $char => $code) {
-            $header .= decbin(ord($char));
-            $header .= "\\s";
-            $header .= $code;
-        }
-
-        return $header;
+        return stream_get_contents($stream);
     }
 }

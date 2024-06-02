@@ -1,11 +1,17 @@
 <?php
 
-use App\HuffmanCoder;
+use App\HuffmanAlgo;
 
-it('can compress a file', function () {
-    $file = file_get_contents('tests/datasets/step1/something.txt');
+it('can encode and decode a file', function () {
+    $inputPath = 'tests/datasets/test1.txt';
 
-    $coder = new HuffmanCoder();
+    $encodedPath = 'tests/datasets/encoded.bin';
 
-    $coder->encode($file, 'tests/datasets/step1/test.bin');
+    $coder = new HuffmanAlgo();
+
+    $coder->encode($inputPath, $encodedPath);
+
+    $decodedPath = $coder->decode($encodedPath, 'tests/datasets/decoded.txt');
+
+    $this->assertSame(file_get_contents($inputPath), file_get_contents($decodedPath));
 });
