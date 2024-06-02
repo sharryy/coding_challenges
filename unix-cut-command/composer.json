@@ -1,0 +1,38 @@
+{
+  "name": "sharryy/unix-cut-command",
+  "description": "Unix Command Line utility cut",
+  "type": "library",
+  "version": "1.0.0",
+  "require-dev": {
+    "pestphp/pest": "^2.34"
+  },
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/pest"
+  },
+  "authors": [
+    {
+      "name": "Sharryy",
+      "email": "ibneadam388@gmail.com"
+    }
+  ],
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  },
+  "require": {
+    "symfony/var-dumper": "^6.4",
+    "symfony/console": "^6.4"
+  }
+}
