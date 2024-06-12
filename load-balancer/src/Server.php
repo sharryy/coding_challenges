@@ -2,6 +2,8 @@
 
 namespace App;
 
+use InvalidArgumentException;
+
 class Server
 {
     public function __construct(
@@ -15,6 +17,10 @@ class Server
     public static function create(string $url): self
     {
         $url = parse_url($url);
+
+        if ($url === false || ! isset($url['host'], $url['port'])) {
+            throw new InvalidArgumentException(sprintf('Invalid URL: %s', $url));
+        }
 
         return new self($url['host'], $url['port'], true, 0);
     }
@@ -32,6 +38,16 @@ class Server
     public function getPort(): int
     {
         return $this->port;
+    }
+
+    public function inactivate(): void
+    {
+        $this->healthy = false;
+    }
+
+    public function activate(): void
+    {
+        $this->healthy = true;
     }
 
     public function getConnections(): int

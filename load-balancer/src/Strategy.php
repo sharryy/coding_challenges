@@ -7,11 +7,8 @@ use InvalidArgumentException;
 enum Strategy: string
 {
     case ROUND_ROBIN = 'round-robin';
-
     case RANDOM = 'random';
-
     case LEAST_CONNECTION = 'least-connection';
-
     case IP_HASH = 'ip-hash';
 
     public static function fromString(string $strategy): self
@@ -25,13 +22,19 @@ enum Strategy: string
         };
     }
 
-    public function getServer(array $servers): Server
+    public function getServer(array $servers, array $params = []): Server
     {
+        $servers = $this->getHealthyServers($servers);
+
+        if (empty($servers)) {
+            throw new NoHealthyServersFound();
+        }
+
         return match ($this) {
             self::ROUND_ROBIN => $this->roundRobin($servers),
             self::RANDOM => $this->random($servers),
             self::LEAST_CONNECTION => $this->leastConnection($servers),
-            self::IP_HASH => $this->ipHash($servers),
+            self::IP_HASH => $this->ipHash($servers, $params),
         };
     }
 
@@ -63,12 +66,21 @@ enum Strategy: string
         return $servers[0];
     }
 
-    private function ipHash(array $servers): Server
+    private function ipHash(array $servers, array $params): Server
     {
-        $clientIp = gethostbyname(gethostname());
+        if (! isset($params['REMOTE_ADDR'])) {
+            throw new InvalidArgumentException('Missing REMOTE_ADDR in request params');
+        }
 
-        $hash = ip2long($clientIp) % count($servers);
+        $ip = $params['REMOTE_ADDR'];
+
+        $hash = ip2long($ip) % count($servers);
 
         return $servers[$hash];
+    }
+
+    private function getHealthyServers(array $servers): array
+    {
+        return array_values(array_filter($servers, fn(Server $server) => $server->isHealthy()));
     }
 }
