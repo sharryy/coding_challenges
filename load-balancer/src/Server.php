@@ -2,9 +2,10 @@
 
 namespace App;
 
+use Stringable;
 use InvalidArgumentException;
 
-class Server
+class Server implements Stringable
 {
     public function __construct(
         protected string $ip,
@@ -58,5 +59,10 @@ class Server
     public function incrementConnections(): void
     {
         $this->connections++;
+    }
+
+    public function __toString(): string
+    {
+        return sprintf("%s:%d", $this->ip, $this->port);
     }
 }

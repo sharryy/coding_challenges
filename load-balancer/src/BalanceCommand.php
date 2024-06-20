@@ -42,10 +42,10 @@ class BalanceCommand extends Command
         $server = new HttpServer(function (ServerRequestInterface $request) use ($output, $input) {
             $this->logRequest($output, $request);
             $server = Strategy::fromString($input->getOption('strategy'))->getServer($this->servers, $request->getServerParams());
-            $output->writeln("<info>Forwarding request to {$server->getIp()}:{$server->getPort()}</info>");
+            $output->writeln("<info>Forwarding request to {$server->__toString()}</info>");
 
             return (new Browser())
-                ->request($request->getMethod(), "http://{$server->getIp()}:{$server->getPort()}{$request->getUri()->getPath()}")
+                ->request($request->getMethod(), "http://{$server->__toString()}{$request->getUri()->getPath()}")
                 ->then(function ($response) use ($output, $server) {
                     $this->logResponse($output, $server, $response);
                     $server->incrementConnections();
@@ -80,7 +80,7 @@ class BalanceCommand extends Command
 
     private function logResponse(OutputInterface $output, Server $server, $response): void
     {
-        $output->writeln("Response from {$server->getIp()}:{$server->getPort()}");
+        $output->writeln("Response from {$server->__toString()}");
         $output->writeln("HTTP/{$response->getProtocolVersion()} {$response->getStatusCode()} {$response->getReasonPhrase()}");
         $output->writeln("Content-Length: {$response->getHeaderLine('Content-Length')}");
         $output->writeln("Content-Type: {$response->getHeaderLine('Content-Type')}");
@@ -94,19 +94,19 @@ class BalanceCommand extends Command
         Loop::addPeriodicTimer(static::HEALTH_CHECK_INTERVAL, function () use ($output, $browser) {
             $promises = [];
             foreach ($this->servers as $server) {
-                $promises[] = $browser->get("http://{$server->getIp()}:{$server->getPort()}")
+                $promises[] = $browser->get("http://{$server->__toString()}")
                     ->then(function (Response $response) use ($server, $output) {
                         if ($response->getStatusCode() !== self::STATUS_OK && $server->isHealthy()) {
                             $server->inactivate();
-                            $output->writeln("<error>Server {$server->getIp()}:{$server->getPort()} is down</error>");
+                            $output->writeln("<error>Server {$server->__toString()} is down</error>");
                         } elseif ($response->getStatusCode() === self::STATUS_OK && ! $server->isHealthy()) {
                             $server->activate();
-                            $output->writeln("<info>Server {$server->getIp()}:{$server->getPort()} is up</info>");
+                            $output->writeln("<info>Server {$server->__toString()} is up</info>");
                         }
                     }, function () use ($server, $output) {
                         if ($server->isHealthy()) {
                             $server->inactivate();
-                            $output->writeln("<error>Server {$server->getIp()}:{$server->getPort()} is down</error>");
+                            $output->writeln("<error>Server {$server->__toString()} is down</error>");
                         }
                     });
             }
